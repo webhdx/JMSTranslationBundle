@@ -101,7 +101,7 @@ class FileExtractorTest extends TestCase
     private function extract($directory)
     {
         $twig = new Environment(new ArrayLoader(array()));
-        $twig->addExtension(new SymfonyTranslationExtension($translator = new IdentityTranslator(new MessageSelector())));
+        $twig->addExtension(new SymfonyTranslationExtension($translator = new IdentityTranslator()));
         $twig->addExtension(new TranslationExtension($translator));
         $loader=new FilesystemLoader(realpath(__DIR__."/Fixture/SimpleTest/Resources/views/"));
         $twig->setLoader($loader);

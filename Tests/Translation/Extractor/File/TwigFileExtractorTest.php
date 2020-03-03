@@ -146,7 +146,7 @@ class TwigFileExtractorTest extends TestCase
         }
 
         $env = new Environment(new ArrayLoader(array()));
-        $env->addExtension(new SymfonyTranslationExtension($translator = new IdentityTranslator(new MessageSelector())));
+        $env->addExtension(new SymfonyTranslationExtension($translator = new IdentityTranslator()));
         $env->addExtension(new TranslationExtension($translator, true));
         $env->addExtension(new RoutingExtension(new UrlGenerator(new RouteCollection(), new RequestContext())));
         $env->addExtension(new FormExtension());

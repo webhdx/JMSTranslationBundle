@@ -153,7 +153,7 @@ class MessageCatalogue
     private function getOrCreateDomain($domain)
     {
         if (!$this->hasDomain($domain)) {
-            $this->domains[$domain] = new MessageCollection($this);
+            $this->domains[$domain] = new MessageCollection();
         }
 
         return $this->domains[$domain];

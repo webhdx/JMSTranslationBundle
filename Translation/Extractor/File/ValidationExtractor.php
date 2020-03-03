@@ -21,9 +21,7 @@ namespace JMS\TranslationBundle\Translation\Extractor\File;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
-use Symfony\Component\Validator\Mapping\ClassMetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface as LegacyMetadataFactoryInterface;
 use JMS\TranslationBundle\Model\Message;
 use JMS\TranslationBundle\Model\MessageCatalogue;
 use JMS\TranslationBundle\Translation\Extractor\FileVisitorInterface;
@@ -37,7 +35,7 @@ use Twig\Node\Node as TwigNode;
 class ValidationExtractor implements FileVisitorInterface, NodeVisitor
 {
     /**
-     * @var ClassMetadataFactoryInterface|MetadataFactoryInterface|LegacyMetadataFactoryInterface
+     * @var MetadataFactoryInterface
      */
     private $metadataFactory;
 
@@ -67,11 +65,7 @@ class ValidationExtractor implements FileVisitorInterface, NodeVisitor
      */
     public function __construct($metadataFactory)
     {
-        if (! (
-            $metadataFactory instanceof MetadataFactoryInterface
-            || $metadataFactory instanceof LegacyMetadataFactoryInterface
-            || $metadataFactory instanceof ClassMetadataFactoryInterface
-        )) {
+        if (!$metadataFactory instanceof MetadataFactoryInterface) {
             throw new \InvalidArgumentException(sprintf('%s expects an instance of MetadataFactoryInterface or ClassMetadataFactoryInterface', get_class($this)));
         }
         $this->metadataFactory = $metadataFactory;
@@ -104,7 +98,7 @@ class ValidationExtractor implements FileVisitorInterface, NodeVisitor
             return;
         }
 
-        $metadata = ($this->metadataFactory instanceof ClassMetadataFactoryInterface)? $this->metadataFactory->getClassMetadata($name) : $this->metadataFactory->getMetadataFor($name);
+        $metadata = $this->metadataFactory->getMetadataFor($name);
         if (!$metadata->hasConstraints() && !count($metadata->getConstrainedProperties())) {
             return;
         }

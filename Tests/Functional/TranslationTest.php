@@ -8,9 +8,9 @@ class TranslationTest extends BaseTestCase
     {
         $client = $this->createClient();
         $client->request('GET', '/apples/view');
-	$response = $client->getResponse();
+	    $response = $client->getResponse();
 
         $this->assertEquals(200, $response->getStatusCode(), substr($response, 0, 2000));
-        $this->assertEquals("There are 5 apples\n\nThere are 5 apples", $response->getContent());
+        $this->assertEquals("There are 5 apples\n\nThere are 5 apples\n", $response->getContent());
     }
 }

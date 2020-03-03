@@ -23,7 +23,7 @@ namespace JMS\TranslationBundle\Twig;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -87,17 +87,17 @@ class TranslationExtension extends AbstractExtension
      * @param null|string $locale
      * @return string
      */
-    public function transchoiceWithDefault($message, $defaultMessage, $count, array $arguments = array(), $domain = null, $locale = null)
+    public function transchoiceWithDefault($message, $defaultMessage, array $arguments = array(), $domain = null, $locale = null)
     {
         if (null === $domain) {
             $domain = 'messages';
         }
 
         if (false == $this->translator->getCatalogue($locale)->defines($message, $domain)) {
-            return $this->translator->transChoice($defaultMessage, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
+            return $this->translator->trans($defaultMessage, $arguments, $domain, $locale);
         }
 
-        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
+        return $this->translator->trans($message, $arguments, $domain, $locale);
     }
 
     /**

@@ -21,13 +21,13 @@ namespace JMS\TranslationBundle\Twig;
 use JMS\TranslationBundle\Exception\RuntimeException;
 use JMS\TranslationBundle\Twig\Node\Transchoice;
 use Twig\Environment;
-use Twig\NodeVisitor\AbstractNodeVisitor;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\Binary\EqualBinary;
 use Twig\Node\Expression\ConditionalExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
 use Twig\Node\Node;
+use Twig\NodeVisitor\AbstractNodeVisitor;
 
 /**
  * Applies the value of the "desc" filter if the "trans" filter has no
@@ -62,26 +62,27 @@ class DefaultApplyingNodeVisitor extends AbstractNodeVisitor
         }
 
         if ($node instanceof FilterExpression
-                && 'desc' === $node->getNode('filter')->getAttribute('value')) {
+            && 'desc' === $node->getNode('filter')->getAttribute('value')) {
             $transNode = $node->getNode('node');
-            while ($transNode instanceof FilterExpression
-                       && 'trans' !== $transNode->getNode('filter')->getAttribute('value')
-                       && 'transchoice' !== $transNode->getNode('filter')->getAttribute('value')) {
+            while (
+                $transNode instanceof FilterExpression
+                && 'trans' !== $transNode->getNode('filter')->getAttribute('value')
+            ) {
                 $transNode = $transNode->getNode('node');
             }
 
             if (!$transNode instanceof FilterExpression) {
-                throw new RuntimeException(sprintf('The "desc" filter must be applied after a "trans", or "transchoice" filter.'));
+                throw new RuntimeException(sprintf('The "desc" filter must be applied after a "trans" filter.'));
             }
 
             $wrappingNode = $node->getNode('node');
             $testNode = clone $wrappingNode;
             $defaultNode = $node->getNode('arguments')->getNode(0);
 
-            // if the |transchoice filter is used, delegate the call to the TranslationExtension
+            // if the |trans filter with conditional text is used, delegate the call to the TranslationExtension
             // so that we can catch a possible exception when the default translation has not yet
             // been extracted
-            if ('transchoice' === $transNode->getNode('filter')->getAttribute('value')) {
+            if ($this->isTransNodeConditional($transNode)) {
                 $transchoiceArguments = new ArrayExpression(array(), $transNode->getTemplateLine());
                 $transchoiceArguments->addElement($wrappingNode->getNode('node'));
                 $transchoiceArguments->addElement($defaultNode);
@@ -127,7 +128,38 @@ class DefaultApplyingNodeVisitor extends AbstractNodeVisitor
         return $node;
     }
 
+    private function isTransNodeConditional(FilterExpression $node)
+    {
+        if ('trans' !== $node->getNode('filter')->getAttribute('value')) {
+            return false;
+        }
+
+        $transArgumentNode = $node->getNode('arguments');
+        foreach ($transArgumentNode->getIterator() as $transFilterArgument) {
+            if (!$transFilterArgument instanceof ArrayExpression) {
+                continue;
+            }
+
+            foreach ($transFilterArgument->getIterator() as $translationParameterNode) {
+                if (!$translationParameterNode->hasAttribute('value')) {
+                    continue;
+                }
+
+                // @todo Is there any better way to check if this is a conditional form?
+                if ($translationParameterNode->getAttribute('value') === '%count%') {
+                    return true;
+                }
+            }
+
+
+        }
+
+        return false;
+    }
+
     /**
+     * @param Node $node
+     * @param Environment $env
      * @return Node
      */
     public function doLeaveNode(Node $node, Environment $env)

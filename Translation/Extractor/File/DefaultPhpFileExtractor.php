@@ -87,7 +87,6 @@ class DefaultPhpFileExtractor implements LoggerAwareInterface, FileVisitorInterf
      */
     protected $methodsToExtractFrom = array(
         'trans' => 2,
-        'transchoice' => 3,
     );
 
     /**

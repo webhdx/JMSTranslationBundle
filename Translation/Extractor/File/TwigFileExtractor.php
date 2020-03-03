@@ -90,7 +90,7 @@ class TwigFileExtractor extends AbstractNodeVisitor implements FileVisitorInterf
         } elseif ($node instanceof FilterExpression) {
             $name = $node->getNode('filter')->getAttribute('value');
 
-            if ('trans' === $name || 'transchoice' === $name) {
+            if ('trans' === $name) {
                 $idNode = $node->getNode('node');
                 if (!$idNode instanceof ConstantExpression) {
                     return $node;
