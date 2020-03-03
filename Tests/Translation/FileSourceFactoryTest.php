@@ -13,9 +13,9 @@ class FileSourceFactoryTest extends TestCase
      *
      * @dataProvider pathProvider
      */
-    public function testGetRelativePath($root, $file, $expected, $message = '')
+    public function testGetRelativePath($projectRoot, $file, $expected, $message = '')
     {
-        $factory = new FileSourceFactory($root);
+        $factory = new FileSourceFactory($projectRoot);
         $result = NSA::invokeMethod($factory, 'getRelativePath', $file);
 
         $this->assertEquals($expected, $result, $message);
@@ -49,6 +49,33 @@ class FileSourceFactoryTest extends TestCase
                 '/../../../../../../src/bundle/controller/index.php',
                 'Test when the root path is longer that file path',
             ),
+
+            array(
+                '/user/foo/application',
+                '/user/foo/application/src/bundle/controller/index.php',
+                '/src/bundle/controller/index.php',
+            ),
+
+            array(
+                '/user/foo/application/src/foo/bar',
+                '/user/foo/application/src/bundle/controller/index.php',
+                '/../../bundle/controller/index.php',
+            ),
+
+            array(
+                '/user/foo/application',
+                '/user/foo/application/app/../src/AppBundle/Controller/DefaultController.php',
+                '/app/../src/AppBundle/Controller/DefaultController.php',
+                'Test with "/../" in the file path',
+            ),
+
+            array(
+                '/user/foo/application/src/foo/bar/baz/biz/foo',
+                '/user/foo/application/src/bundle/controller/index.php',
+                '/../../../../../bundle/controller/index.php',
+                'Test when the root path is longer that file path',
+            ),
+
         );
     }
 }

@@ -22,19 +22,12 @@ use JMS\TranslationBundle\Model\FileSource;
 
 class FileSourceFactory
 {
-    /**
-     * @var string
-     */
-    protected $kernelRoot;
+    /** @var string */
+    protected $baseDir;
 
-    /**
-     * FileSourceFactory constructor.
-     *
-     * @param string $kernelRoot
-     */
-    public function __construct($kernelRoot)
+    public function __construct(string $baseDir = null)
     {
-        $this->kernelRoot = $kernelRoot;
+        $this->baseDir = $baseDir;
     }
 
     /**
@@ -58,15 +51,15 @@ class FileSourceFactory
      */
     private function getRelativePath($path)
     {
-        if (0 === strpos($path, $this->kernelRoot)) {
-            return substr($path, strlen($this->kernelRoot));
+        if (0 === strpos($path, $this->baseDir)) {
+            return substr($path, strlen($this->baseDir));
         }
 
         $relativePath = $ds = DIRECTORY_SEPARATOR;
-        $rootArray = explode($ds, $this->kernelRoot);
+        $rootArray = explode($ds, $this->baseDir);
         $pathArray = explode($ds, $path);
 
-        // Take the first directory in the kernelRoot tree
+        // Take the first directory in the baseDir tree
         foreach ($rootArray as $rootCurrentDirectory) {
             // Take the first directory from the path tree
             $pathCurrentDirectory = array_shift($pathArray);

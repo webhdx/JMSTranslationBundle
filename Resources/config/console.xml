@@ -6,10 +6,15 @@
 
     <services>
         <service id="jms_translation.command.extract" class="JMS\TranslationBundle\Command\ExtractTranslationCommand" public="false">
+            <argument key="$configFactory" type="service" id="jms_translation.config_factory"/>
+            <argument key="$updater" type="service" id="jms_translation.updater"/>
+            <argument key="$defaultLocales">%jms_translation.locales%</argument>
             <tag name="console.command" command="translation:extract" />
         </service>
 
         <service id="jms_translation.command.list_resources" class="JMS\TranslationBundle\Command\ResourcesListCommand" public="false">
+            <argument key="$projectDir">%kernel.project_dir%</argument>
+            <argument key="$bundles">%kernel.bundles%</argument>
             <tag name="console.command" command="translation:list-resources" />
         </service>
     </services>
